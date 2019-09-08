@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.roam.dao.SysPlatformBoardMapper">
+  <resultMap id="BaseResultMap" type="com.hp.roam.model.SysPlatformBoard">
+    <id column="board_uuid" jdbcType="VARCHAR" property="board_uuid" />
+    <result column="platform_code" jdbcType="VARCHAR" property="platform_code" />
+    <result column="openfire_username" jdbcType="VARCHAR" property="openfire_username" />
+    <result column="openfire_password" jdbcType="VARCHAR" property="openfire_password" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="create_time" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    board_uuid, platform_code, openfire_username, openfire_password, create_time
+  </sql>
+  <select id="selectByExample" parameterType="com.hp.roam.model.SysPlatformBoardExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from sys_platform_board
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_platform_board
+    where board_uuid = #{board_uuid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAllAsc" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_platform_board ORDER BY (SUBSTRING(openfire_username,6)+0) asc
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from sys_platform_board
+    where board_uuid = #{board_uuid,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hp.roam.model.SysPlatformBoardExample">
+    delete from sys_platform_board
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hp.roam.model.SysPlatformBoard">
+    insert into sys_platform_board (board_uuid, platform_code, openfire_username, 
+      openfire_password, create_time)
+    values (#{board_uuid,jdbcType=VARCHAR}, #{platform_code,jdbcType=VARCHAR}, #{openfire_username,jdbcType=VARCHAR}, 
+      #{openfire_password,jdbcType=VARCHAR}, #{create_time,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hp.roam.model.SysPlatformBoard">
+    insert into sys_platform_board
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="board_uuid != null">
+        board_uuid,
+      </if>
+      <if test="platform_code != null">
+        platform_code,
+      </if>
+      <if test="openfire_username != null">
+        openfire_username,
+      </if>
+      <if test="openfire_password != null">
+        openfire_password,
+      </if>
+      <if test="create_time != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="board_uuid != null">
+        #{board_uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="platform_code != null">
+        #{platform_code,jdbcType=VARCHAR},
+      </if>
+      <if test="openfire_username != null">
+        #{openfire_username,jdbcType=VARCHAR},
+      </if>
+      <if test="openfire_password != null">
+        #{openfire_password,jdbcType=VARCHAR},
+      </if>
+      <if test="create_time != null">
+        #{create_time,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hp.roam.model.SysPlatformBoardExample" resultType="java.lang.Long">
+    select count(*) from sys_platform_board
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update sys_platform_board
+    <set>
+      <if test="record.board_uuid != null">
+        board_uuid = #{record.board_uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.platform_code != null">
+        platform_code = #{record.platform_code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.openfire_username != null">
+        openfire_username = #{record.openfire_username,jdbcType=VARCHAR},
+      </if>
+      <if test="record.openfire_password != null">
+        openfire_password = #{record.openfire_password,jdbcType=VARCHAR},
+      </if>
+      <if test="record.create_time != null">
+        create_time = #{record.create_time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update sys_platform_board
+    set board_uuid = #{record.board_uuid,jdbcType=VARCHAR},
+      platform_code = #{record.platform_code,jdbcType=VARCHAR},
+      openfire_username = #{record.openfire_username,jdbcType=VARCHAR},
+      openfire_password = #{record.openfire_password,jdbcType=VARCHAR},
+      create_time = #{record.create_time,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hp.roam.model.SysPlatformBoard">
+    update sys_platform_board
+    <set>
+      <if test="platform_code != null">
+        platform_code = #{platform_code,jdbcType=VARCHAR},
+      </if>
+      <if test="openfire_username != null">
+        openfire_username = #{openfire_username,jdbcType=VARCHAR},
+      </if>
+      <if test="openfire_password != null">
+        openfire_password = #{openfire_password,jdbcType=VARCHAR},
+      </if>
+      <if test="create_time != null">
+        create_time = #{create_time,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where board_uuid = #{board_uuid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hp.roam.model.SysPlatformBoard">
+    update sys_platform_board
+    set platform_code = #{platform_code,jdbcType=VARCHAR},
+      openfire_username = #{openfire_username,jdbcType=VARCHAR},
+      openfire_password = #{openfire_password,jdbcType=VARCHAR},
+      create_time = #{create_time,jdbcType=TIMESTAMP}
+    where board_uuid = #{board_uuid,jdbcType=VARCHAR}
+  </update>
+</mapper>

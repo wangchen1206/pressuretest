@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta content="text/html;charset=UTF-8" />
+<title sec:authentication="name"></title>
+<link rel="stylesheet" th:href="@{css/bootstrap.css}" />
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<style type="text/css">
+body {
+	padding-top: 50px;
+}
+
+.starter-template {
+	padding: 11% 17%;
+	text-align: center;
+}
+</style>
+<script type="text/javascript">
+	$(function(){
+		var aespassword = $("#aesPassword");
+		var reAesPassword = $("#reAesPassword");
+		reAesPassword.blur(function(){
+			if(aespassword.val()!=reAesPassword.val()){
+				alert("AES密钥确认和AES密钥不一致");
+				reAesPassword.val("");
+			}
+		});
+	});
+</script>
+</head>
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Pressure Test</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a th:href="@{/}"> 首页 </a></li>
+					<li sec:authorize="hasRole('ROLE_ADMIN')"><a
+						th:href="@{/clearAll}"><font color="red">Truncate Board</font></a></li>
+					<!-- <li><a th:href="@{/records}">Board Record</a></li> -->
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							Status Report 
+							<b class="caret"></b>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a th:href="@{/singledaydevices}">Multi Devices Report</a></li>
+							<li><a th:href="@{/singledaydevice}">Single Device Report</a></li>
+						</ul>
+					</li>
+				</ul>
+			<form class="navbar-form navbar-right" th:action="@{/logout}"
+				method="post">
+				<input type="submit" class="btn btn-primary" value="注销" />
+			</form>
+			</div>
+			<!--/.nav-collapse -->
+
+		</div>
+	</nav>
+
+
+	<div class="container">
+
+		<div class="starter-template">
+
+			<form name="form" th:action="@{/getBoards}" method="POST">
+				<!-- 3 -->
+				<div class="form-group">
+					<label for="aesPassword">AES密钥</label> <input id="aesPassword" type="password"
+						class="form-control" name="aesPassword"
+						placeholder="the password of AES" />
+				</div>
+				<div class="form-group">
+					<label for="reAesPassword">AES密钥确认</label> <input id="reAesPassword" type="password"
+						class="form-control" name="reAesPassword"
+						placeholder="the confirm of AES Password" />
+				</div>
+				
+				<div class="form-group">
+					<label for="lengthOfSn">序列号位数</label> <input type="text"
+						class="form-control" name="lengthOfSn" value=""
+						placeholder="the length of SN" />
+				</div>
+				<div class="form-group">
+					<label for="startSn">SN起始数值</label> <input type="text"
+						class="form-control" name="startSn" placeholder="the value of SN" />
+				</div>
+				<div class="form-group">
+					<label for="numOfSn">SN的数量</label> <input type="text"
+						class="form-control" name="numOfSn" value=""
+						placeholder="the num of SN" />
+				</div>
+				<div class="form-group">
+					<label for="lengthOfUsername">用户名长度</label> <input type="text"
+						class="form-control" name="lengthOfUsername"
+						placeholder="the length of Username" />
+				</div>
+				<div class="form-group">
+					<label for="lengthOfPassword">密码长度</label> <input type="text"
+						class="form-control" name="lengthOfPassword"
+						placeholder="the length of Password" />
+				</div>
+				
+				<input type="submit" id="MakeExport" value="MakeExport"
+					class="btn btn-primary" />
+			</form>
+		</div>
+
+	</div>
+
+</body>
+</html>

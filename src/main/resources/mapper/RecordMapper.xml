@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.roam.dao.RecordMapper">
+  <resultMap id="BaseResultMap" type="com.hp.roam.model.Record">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="deviceId" jdbcType="VARCHAR" property="deviceId" />
+    <result column="recordDate" jdbcType="VARCHAR" property="recordDate" />
+    <result column="type" jdbcType="INTEGER" property="type" />
+    <result column="startTime" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="endTime" jdbcType="TIMESTAMP" property="endTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, deviceId, recordDate, type, startTime, endTime
+  </sql>
+  <select id="selectByExample" parameterType="com.hp.roam.model.RecordExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hp.roam.model.RecordExample">
+    delete from record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  
+  <insert id="batchInsert">
+    insert into record (id, deviceId, recordDate, 
+      type, startTime, endTime)
+    values 
+    <foreach collection="records" item="record" separator=",">
+	    (#{record.id,jdbcType=INTEGER}, #{record.deviceId,jdbcType=VARCHAR}, #{record.recordDate,jdbcType=VARCHAR}, 
+	      #{record.type,jdbcType=INTEGER}, #{record.startTime,jdbcType=TIMESTAMP}, #{record.endTime,jdbcType=TIMESTAMP}
+	      )
+    </foreach>
+  </insert>
+  
+  <insert id="insert" parameterType="com.hp.roam.model.Record">
+    insert into record (id, deviceId, recordDate, 
+      type, startTime, endTime
+      )
+    values (#{id,jdbcType=INTEGER}, #{deviceId,jdbcType=VARCHAR}, #{recordDate,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.hp.roam.model.Record">
+    insert into record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="deviceId != null">
+        deviceId,
+      </if>
+      <if test="recordDate != null">
+        recordDate,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+      <if test="startTime != null">
+        startTime,
+      </if>
+      <if test="endTime != null">
+        endTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="deviceId != null">
+        #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="recordDate != null">
+        #{recordDate,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hp.roam.model.RecordExample" resultType="java.lang.Long">
+    select count(*) from record
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update record
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.deviceId != null">
+        deviceId = #{record.deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.recordDate != null">
+        recordDate = #{record.recordDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null">
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
+      <if test="record.startTime != null">
+        startTime = #{record.startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.endTime != null">
+        endTime = #{record.endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update record
+    set id = #{record.id,jdbcType=INTEGER},
+      deviceId = #{record.deviceId,jdbcType=VARCHAR},
+      recordDate = #{record.recordDate,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER},
+      startTime = #{record.startTime,jdbcType=TIMESTAMP},
+      endTime = #{record.endTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hp.roam.model.Record">
+    update record
+    <set>
+      <if test="deviceId != null">
+        deviceId = #{deviceId,jdbcType=VARCHAR},
+      </if>
+      <if test="recordDate != null">
+        recordDate = #{recordDate,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="startTime != null">
+        startTime = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        endTime = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hp.roam.model.Record">
+    update record
+    set deviceId = #{deviceId,jdbcType=VARCHAR},
+      recordDate = #{recordDate,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      startTime = #{startTime,jdbcType=TIMESTAMP},
+      endTime = #{endTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

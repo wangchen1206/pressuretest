@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+<meta content="text/html;charset=UTF-8" />
+<title sec:authentication="name">Records</title>
+<link rel="stylesheet" th:href="@{css/bootstrap.css}" />
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script th:src="@{js/laydate.js}"></script>
+<script
+	src="https://cdn.bootcss.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"></script>
+<style type="text/css">
+body {
+	padding-top: 50px;
+	background-color: #f3f3f3;
+}
+
+.starter-template {
+	padding: 1% 1%;
+}
+
+#online {
+	width: 40px;
+	height: 20px;
+	background: #75d874;
+	border-radius: 8px;
+}
+
+#offline {
+	width: 40px;
+	height: 20px;
+	background: #EE7942;
+	border-radius: 8px;
+}
+#allChart{
+	background-color: #ffffff;
+}
+</style>
+<script type="text/javascript">
+	//在Jquery里格式化Date日期时间数据
+	function timeStamp2String(time) {
+		var datetime = new Date();
+		datetime.setTime(time);
+		var year = datetime.getFullYear();
+		var month = datetime.getMonth() + 1 < 10 ? "0"
+				+ (datetime.getMonth() + 1) : datetime.getMonth() + 1;
+		var date = datetime.getDate() < 10 ? "0" + datetime.getDate()
+				: datetime.getDate();
+		var hour = datetime.getHours() < 10 ? "0" + datetime.getHours()
+				: datetime.getHours();
+		var minute = datetime.getMinutes() < 10 ? "0" + datetime.getMinutes()
+				: datetime.getMinutes();
+		var second = datetime.getSeconds() < 10 ? "0" + datetime.getSeconds()
+				: datetime.getSeconds();
+		return year + "-" + month + "-" + date + " " + hour + ":" + minute
+				+ ":" + second;
+	}
+	
+	function timeStamp2ShortString(time) {
+		var datetime = new Date();
+		datetime.setTime(time);
+		var year = datetime.getFullYear();
+		var month = datetime.getMonth() + 1 < 10 ? (datetime.getMonth() + 1) : datetime.getMonth() + 1;
+		var date = datetime.getDate() < 10 ? datetime.getDate()
+				: datetime.getDate();
+		var hour = datetime.getHours() < 10 ? "0" + datetime.getHours()
+				: datetime.getHours();
+		var minute = datetime.getMinutes() < 10 ? "0" + datetime.getMinutes()
+				: datetime.getMinutes();
+		var second = datetime.getSeconds() < 10 ? "0" + datetime.getSeconds()
+				: datetime.getSeconds();
+		return month + "-" + date + " " + hour + ":" + minute;
+	}
+
+	function getRecords(records, myChart) {
+		var startTime = $("#startTime").val();
+		var endTime = $("#endTime").val();
+		var date = new Date();
+		if (startTime == "") {
+			var time = timeStamp2String(date.getTime());
+			startTime = time.substr(0, time.indexOf(" ")) + " 00:00:00";
+			$("#startTime").attr("value", startTime);
+		}
+		if (endTime == "") {
+			endTime = timeStamp2String(date.getTime());
+			$("#endTime").attr("value", endTime);
+		}
+
+		$.ajax({
+			url : "/test/recordsByDate",
+			type : "GET",
+			async : false,
+			data : {
+				"startTime" : startTime,
+				"endTime" : endTime
+			},
+			success : function(datas) {
+				records = eval(datas);
+				//alert(records[0].startTime);
+			},
+			error : function() {
+				window.location.href = "/test/records";
+			}
+		});
+		//return records;
+
+		var data = [];
+		var dataCount = 100;
+		var startDate = new Date(startTime).getTime();
+		var endDate = new Date(endTime).getTime();
+		var categories = [ 'board20', 'board21', 'board22', 'board23',
+				'board24', 'board25', 'board26', 'board27', 'board28',
+				'board29' ];
+		var types = [ {
+			state : 'Offline',
+			color : '#ee7942'
+		}, {
+			state : 'Online',
+			color : '#75d874'
+		} ];
+		
+		//alert(categories.length);
+		//匹配设备名称，筛选出online的时间段
+		echarts.util.each(categories, function(category, index) {
+			$.each(records, function(recordIndex, record) {
+				if (category == record.deviceId) {
+					data.push({
+						name : types[record.type].state,
+						value : [ index, new Date(record.startTime),
+								new Date(record.endTime) ],
+						itemStyle : {
+							normal : {
+								color : types[record.type].color
+							}
+						}
+					});
+				}
+			});
+
+		});
+
+		option = {
+			tooltip : {
+				formatter : function(params) {
+					return params.marker + params.name + ': '
+							+ timeStamp2String(params.value[1].getTime()) + "~"
+							+ timeStamp2String(params.value[2].getTime());
+				}
+			},
+			title : {
+				text : 'Borads Status',
+				left : 'center'
+			},
+			/* legend : {
+				data : types.map(type=>{
+					return {
+						name:type.state
+					};
+				} ),
+				bottom: "1%",
+				selectedMode:false,
+			}, */
+			 dataZoom: [{
+			        type: 'slider',
+			        filterMode: 'weakFilter',
+			        showDataShadow: false,
+			        top: 510,
+			        height: 10,
+			        borderColor: 'transparent',
+			        backgroundColor: '#e2e2e2',
+			        handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+			        handleSize: 20,
+			        handleStyle: {
+			            shadowBlur: 6,
+			            shadowOffsetX: 1,
+			            shadowOffsetY: 2,
+			            shadowColor: '#000'
+			        },
+			        labelFormatter: 'Time'
+			    },{
+			        type: 'slider',
+			        width: "10px",
+			        filterMode: 'weakFilter',
+			        yAxisIndex:0,
+			        showDataShadow: false,
+			        top: "12%",
+			        height: "65%",
+			        left:"3%",
+			        borderColor: 'transparent',
+			        backgroundColor: '#e2e2e2',
+			        handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+			        handleSize: 20,
+			        handleStyle: {
+			            shadowBlur: 6,
+			            shadowOffsetX: 1,
+			            shadowOffsetY: 2,
+			            shadowColor: '#000'
+			        },
+			        labelFormatter: 'Board'
+			    }],
+			//调整视图的高度。
+			grid : {
+				show:false,
+				height : 400,
+			},
+			xAxis : {
+				min : startDate,
+				max : endDate,
+				type : 'value',
+				scale : true,
+				axisLabel : {
+					formatter : function(val) {
+						return timeStamp2ShortString(new Date(val).getTime());
+					}
+				}
+			},
+			yAxis : {
+				nameTextStyle: {
+					fontSize:18
+				},
+				data : categories.map(category=>{
+					return {
+						value:category,
+						textStyle:{
+							fontSize:14
+						}
+					}
+				})
+			},
+			series : [
+			    //用空的bar来显示两个图例
+				{name : types[0].state,type:"bar",data:[]},
+				{name : types[1].state,type:"bar",data:[]},
+				{type : 'custom',
+				renderItem : function(params, api) {
+					var categoryIndex = api.value(0);
+					var start = api.coord([ api.value(1), categoryIndex ]);
+					var end = api.coord([ api.value(2), categoryIndex ]);
+					var height = api.size([ 0, 1 ])[1] * 0.6;
+
+					var rectShape = echarts.graphic.clipRectByRect({
+						x : start[0],
+						y : start[1] - height / 2,
+						width : end[0] - start[0],
+						height : height
+					}, {
+						x : params.coordSys.x,
+						y : params.coordSys.y,
+						width : params.coordSys.width,
+						height : params.coordSys.height
+					});
+
+					return rectShape && {
+						type : 'rect',
+						shape : rectShape,
+						style : api.style()
+					};
+				},
+				itemStyle : {
+					normal : {
+						//状态颜色透明度
+						opacity : 1
+					}
+				},
+				encode : {
+					x : [ 1, 2 ],
+					y : 0
+				},
+				data : data
+			} ],
+			// 线性渐变，前四个参数分别是 x0, y0, x2, y2, 范围从 0 - 1，相当于在图形包围盒中的百分比，如果 globalCoord 为 `true`，则该四个值是绝对的像素位置
+			backgroundColor : {
+				type : 'linear',
+				x : 0,
+				y : 0,
+				x2 : 0,
+				y2 : 1,
+				colorStops : [ {
+					offset : 0,
+					color : '#ffffff' // 0% 处的颜色
+				}, {
+					offset : 1,
+					color : '#ffffff' // 100% 处的颜色
+				} ],
+				global : false
+			// 缺省为 false
+			}
+		};
+		myChart.setOption(option);
+
+	}
+
+	
+	
+	
+	$(function() {
+		var myChart = echarts.init(document.getElementById('myEcharts'));
+		//日期时间选择器
+		laydate.render({
+			elem : '#startTime',
+			type : 'datetime'
+		});
+		laydate.render({
+			elem : '#endTime',
+			type : 'datetime'
+		});
+
+		var records = null;
+		// 基于准备好的dom，初始化echarts实例
+
+		getRecords(records, myChart);
+
+		$("#getRecords").click(function() {
+			getRecords(records, myChart);
+		});
+
+	});
+</script>
+</head>
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">Pressure Test</a>
+			</div>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a th:href="@{/}"> 首页 </a></li>
+				</ul>
+				<form class="navbar-form navbar-right" th:action="@{/logout}"
+					method="post">
+					<input type="submit" class="btn btn-primary" value="注销" />
+				</form>
+			</div>
+			<!--/.nav-collapse -->
+
+		</div>
+	</nav>
+
+
+	<!-- <div class="container"> -->
+	<div>
+
+		<div class="starter-template">
+
+			<form name="form" th:action="@{/recordsBySingleDay}" method="POST">
+
+				<div class="form-inline">
+					<div class="form-group" style="float: right;">
+						<label for="endTime"> <input type="datetime" id="endTime"
+							class="form-control" name="endTime" placeholder="EndTime" /></label>
+					</div>
+					<div class="form-group" style="float: right;">
+						<p>~</p>
+					</div>
+					<div class="form-group" style="float: right;">
+						<label for="startTime"> <input type="datetime"
+							id="startTime" class="form-control" name="startTime"
+							placeholder="StartTime" /></label>
+					</div>
+				</div>
+				<br> <br>
+				<!-- <div class="form-group" style="float: right;">
+					<input type="submit" value="GetRecords"
+						class="btn btn-primary" />
+				</div> -->
+			</form>
+			<div class="form-group" style="float: right;">
+				<button id="getRecords" class="btn btn-primary">GetRecords</button>
+			</div>
+			<br> <br>
+
+			<div id="allChart">
+				<div>
+					<div>
+						<div id="online" style="float: left;"></div>
+						<div style="float: left;">Online</div>
+					</div>
+					<div>
+						<div id="offline" style="float: left;"></div>
+						<div style="float: left;">Offline</div>
+					</div>
+				</div>
+				<div id="myEcharts" style="width: 100%; height: 580px;"></div>
+			</div>
+			
+		</div>
+
+	</div>
+
+</body>
+</html>

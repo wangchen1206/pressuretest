@@ -1,0 +1,15 @@
+version: '3'
+services: 
+  pressuretest:  
+    image: registry.cn-hangzhou.aliyuncs.com/wangchen1206/pressuretest:v0.0.1
+    deploy: 
+      replicas: 4
+      restart_policy: 
+        condition: on-failure
+    ports: 
+      - "8083:8081"
+    networks: 
+      - webnet
+networks: 
+  webnet: 
+    
